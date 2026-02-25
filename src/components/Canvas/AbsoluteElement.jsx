@@ -58,7 +58,7 @@ const AbsoluteElement = ({ element, resumeData }) => {
     if (nextHeight !== element.height) {
       updateElement(element.id, { height: nextHeight });
     }
-  }, [shouldAutoHeight, isEditing, element.id, element.text, element.style, element.width, element.height, renderedContent, updateElement]);
+  }, [shouldAutoHeight, isEditing, element.id, element.text, element.bind, element.style, element.width, element.height, renderedContent, updateElement ,]);
 
   const handleSelectOrEdit = () => {
     if (!isSelected) {
