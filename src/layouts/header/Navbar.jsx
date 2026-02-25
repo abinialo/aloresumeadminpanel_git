@@ -8,11 +8,8 @@ import {
   
 } from "react-icons/fa";
 import { Drawer } from 'antd';
-import { Modal, Input, Button } from "antd";
-import { CiLogout } from "react-icons/ci";
 import { HiTemplate } from "react-icons/hi";
 
-import { HiOutlineLogout } from "react-icons/hi";
 
 const Navbar = () => {
     const [isLogOpen, setLogIsOpen] = useState(false);
@@ -21,15 +18,13 @@ const Navbar = () => {
     const [open, setOpen] = useState(false);
     const logoutRef = useRef(null);
 
-    const location = useLocation();
-    const navigate = useNavigate();
     const toggleSidebar = () => setIsOpen(!isOpen);
-    const handleLogout = () => {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("userid")
-        setLogoutModalOpen(true)
-        setOpen(false);
-    };
+    // const handleLogout = () => {
+    //     localStorage.removeItem("isLoggedIn");
+    //     localStorage.removeItem("userid")
+    //     setLogoutModalOpen(true)
+    //     setOpen(false);
+    // };
     useEffect(() => {
         function handleClickOutside(e) {
             if (logoutRef.current && !logoutRef.current.contains(e.target)) {
