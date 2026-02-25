@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ZoomIn, ZoomOut, Grid, Save, Undo, Redo } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -221,13 +221,17 @@ const AddTemplate = () => {
   const { data: templateBySlugData, isLoading: isTemplateLoading } = useGetTemplateBySlugQuery(slugId);
   const { data: categoriesResponse, isLoading: isCategoryLoading } = useGetAllCategoryQuery();
 
-  const categories = Array.isArray(categoriesResponse)
-    ? categoriesResponse
-    : Array.isArray(categoriesResponse?.data)
-      ? categoriesResponse.data
-      : Array.isArray(categoriesResponse?.categories)
-        ? categoriesResponse.categories
-        : [];
+  const categories = useMemo(
+    () =>
+      Array.isArray(categoriesResponse)
+        ? categoriesResponse
+        : Array.isArray(categoriesResponse?.data)
+          ? categoriesResponse.data
+          : Array.isArray(categoriesResponse?.categories)
+            ? categoriesResponse.categories
+            : [],
+    [categoriesResponse]
+  );
 
   const generateFolderName = (name) => {
     return name

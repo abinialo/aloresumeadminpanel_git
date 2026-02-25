@@ -132,8 +132,10 @@ export const renderElementContent = (element, resumeData = mockResumeData) => {
     return content;
 };
 
-export default {
+const layoutRenderer = {
     calculateLayout,
     renderElementContent,
     resolveBindPath
 };
+
+export default layoutRenderer;
