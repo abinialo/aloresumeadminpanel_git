@@ -1,0 +1,95 @@
+{
+    "basic": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "+1 (555) 123-4567",
+        "location": "San Francisco, CA",
+        "linkedin": "linkedin.com/in/johndoe",
+        "website": "johndoe.com"
+    },
+    "summary": "Experienced software engineer with 5+ years of expertise in full-stack development. Passionate about building scalable applications and leading high-performing teams.",
+    "experience": [
+        {
+            "company": "Tech Corp",
+            "position": "Senior Software Engineer",
+            "location": "San Francisco, CA",
+            "startDate": "2021-01",
+            "endDate": "Present",
+            "description": "Led development of microservices architecture serving 1M+ users. Mentored junior developers and improved code quality through rigorous code reviews."
+        },
+        {
+            "company": "StartupXYZ",
+            "position": "Full Stack Developer",
+            "location": "Remote",
+            "startDate": "2019-06",
+            "endDate": "2020-12",
+            "description": "Built and deployed React-based dashboard and Node.js backend. Reduced page load time by 40% through optimization."
+        }
+    ],
+    "education": [
+        {
+            "institution": "University of California",
+            "degree": "Bachelor of Science in Computer Science",
+            "location": "Berkeley, CA",
+            "startDate": "2015-09",
+            "endDate": "2019-05",
+            "gpa": "3.8"
+        }
+    ],
+    "skills": {
+        "technical": [
+            "JavaScript",
+            "React",
+            "Node.js"
+        ],
+        "tools": [
+            "Git",
+            "Postman",
+            "Docker"
+        ],
+        "softskills": [
+            "Communication",
+            "Leadership"
+        ],
+        "otherskills": [
+            "AWS",
+            "Python"
+        ]
+    },
+    "languages": [
+        "English (Fluent)",
+        "Spanish (Professional)"
+    ],
+    "certifications": [
+        {
+            "name": "AWS Certified Solutions Architect",
+            "description": "Associate level cloud architecture certification.",
+            "link": "https://example.com/cert/aws-saa"
+        },
+        {
+            "name": "Google Professional Cloud Developer",
+            "description": "Professional certification for cloud-native application development.",
+            "link": "https://example.com/cert/gcp-dev"
+        }
+    ],
+    "projects": [
+        {
+            "name": "Project 1",
+            "description": "Description 1",
+            "startDate": "2022-01",
+            "endDate": "2022-03"
+        },
+        {
+            "name": "Project 2",
+            "description": "Description 2",
+            "startDate": "2022-04",
+            "endDate": "2022-06"
+        }
+    ],
+    "customization": {
+        "primaryColor": "#0d9488",
+        "secondaryColor": "#f97316",
+        "fontFamily": "Inter"
+    }
+}
