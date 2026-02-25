@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import useTemplateStore from '../../stores/useTemplateStore';
 import { renderElementContent } from '../../utils/layoutRenderer';

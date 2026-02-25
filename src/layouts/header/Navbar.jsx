@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './navbar.module.css';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet} from 'react-router-dom';
 // import logo from '../../assets/ys_logo_green.png';
 import {
     FaUserCircle,
@@ -14,7 +14,7 @@ import { HiTemplate } from "react-icons/hi";
 const Navbar = () => {
     const [isLogOpen, setLogIsOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
-    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+    const [, setLogoutModalOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const logoutRef = useRef(null);
 
