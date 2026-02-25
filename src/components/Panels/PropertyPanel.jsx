@@ -8,7 +8,7 @@ import { estimateWrappedTextHeight } from '../../utils/textLayout';
  * PropertyPanel - Edit properties of selected element
  */
 const PropertyPanel = () => {
-    const { getSelectedElement, updateElement, removeElement, selectedId } = useTemplateStore();
+    const { getSelectedElement, updateElement, removeElement } = useTemplateStore();
     const element = getSelectedElement();
     const categories = getBindPathsByCategory();
     const isTextLike = ['text', 'heading', 'paragraph', 'subheading', 'bullet-list'].includes(element?.type);
