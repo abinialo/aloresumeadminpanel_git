@@ -1,6 +1,22 @@
 import { create } from "zustand";
 import mockResumeData from "../utils/mockResumeData.json";
 import { estimateWrappedTextHeight } from "../utils/textLayout";
+
+const normalizeElementIds = (elements = []) => {
+  return elements.map((element, index) => {
+    const fallbackId = `${element?.type || "element"}-${Date.now()}-${index}-${Math.floor(Math.random() * 1000)}`;
+    const normalized = {
+      ...element,
+      id: String(element?.id || element?._id || fallbackId),
+    };
+
+    if (Array.isArray(element?.elements)) {
+      normalized.elements = normalizeElementIds(element.elements);
+    }
+
+    return normalized;
+  });
+};
 /**
  * Template Store - Manages the layoutJSON state
  * Includes undo/redo functionality
@@ -193,12 +209,17 @@ const useTemplateStore = create((set, get) => ({
 
   // Load template from API
   loadTemplate: (layoutJSON, resumeData) => {
+    const safeLayout = {
+      ...layoutJSON,
+      elements: normalizeElementIds(layoutJSON?.elements || []),
+    };
+
     set({
-      layout: layoutJSON,
+      layout: safeLayout,
       resumeData: resumeData ?? mockResumeData,
       selectedId: null,
       copiedElement: null,
-      history: [layoutJSON],
+      history: [safeLayout],
       historyIndex: 0,
     });
   },

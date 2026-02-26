@@ -5,7 +5,7 @@ import { renderElementContent } from '../../utils/layoutRenderer';
 import { estimateWrappedTextHeight } from '../../utils/textLayout';
 
 const normalizeBulletText = (text) =>
-  text.replace(/^(\*|-|•|\d+\.)\s+/, '').trim();
+  text.replace(/^(\*|-|\u2022|\d+\.)\s+/, '').trim();
 
 const resolvePath = (data, path) => {
   if (!path || typeof path !== 'string') return '';
@@ -26,7 +26,7 @@ const AbsoluteElement = ({ element, resumeData }) => {
   const { updateElement, selectedId, selectElement } = useTemplateStore();
   const isSelected = selectedId === element.id;
   const isTextLike = ['text', 'heading', 'paragraph', 'subheading', 'bullet-list'].includes(element.type);
-  const canInlineEdit = isTextLike && !element.bind;
+  const canInlineEdit = isTextLike;
 
   const [isEditing, setIsEditing] = useState(false);
   const [draftText, setDraftText] = useState('');
@@ -78,12 +78,17 @@ const AbsoluteElement = ({ element, resumeData }) => {
   const handleDraftChange = (nextText) => {
     setDraftText(nextText);
     requestAnimationFrame(() => {
+      const manualTextUpdate = element.bind
+        ? { text: nextText, bind: '' }
+        : { text: nextText };
+
       if (!shouldAutoHeight) {
-        updateElement(element.id, { text: nextText });
+        updateElement(element.id, manualTextUpdate);
         return;
       }
+
       const nextHeight = getAutoHeight(nextText);
-      updateElement(element.id, { text: nextText, height: nextHeight });
+      updateElement(element.id, { ...manualTextUpdate, height: nextHeight });
     });
   };
 

@@ -31,7 +31,8 @@ const getRepeatRootFromBind = (bind) => {
 
 const buildRepeatFromFlatElements = (elements, root) => {
   if (!Array.isArray(elements) || elements.length === 0) return null;
-  const rowsByKey = new Map();
+  const boundElements = [];
+  const rowStartsByField = new Map();
 
   elements.forEach((el) => {
     const bind = String(el?.bind || '');
@@ -39,53 +40,70 @@ const buildRepeatFromFlatElements = (elements, root) => {
     const field = bind.slice(root.length + 1);
     if (!field) return;
     const y = Number(el.y) || 0;
-    const key = `${field}@${y}`;
-    if (!rowsByKey.has(key)) {
-      rowsByKey.set(key, { field, y, element: el });
+    boundElements.push({ element: el, field, y });
+
+    if (!rowStartsByField.has(field)) rowStartsByField.set(field, []);
+    rowStartsByField.get(field).push(y);
+  });
+
+  if (boundElements.length === 0) return null;
+
+  const fieldCounts = boundElements.reduce((acc, item) => {
+    const count = rowStartsByField.get(item.field)?.length || 1;
+    acc[item.field] = Math.max(acc[item.field] || 0, count);
+    return acc;
+  }, {});
+  const anchorField = Object.entries(fieldCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || boundElements[0].field;
+  const rowStarts = (rowStartsByField.get(anchorField) || [boundElements[0].y]).slice().sort((a, b) => a - b);
+
+  const allRowStarts = Array.from(rowStartsByField.values())
+    .flat()
+    .sort((a, b) => a - b);
+  const uniqueAllRowStarts = allRowStarts.filter((y, idx) => idx === 0 || y !== allRowStarts[idx - 1]);
+  const repeatY = uniqueAllRowStarts[0] ?? Math.min(...boundElements.map((c) => c.y));
+
+  const gaps = [];
+  rowStartsByField.forEach((starts) => {
+    const uniqueStarts = starts.slice().sort((a, b) => a - b).filter((y, idx, arr) => idx === 0 || y !== arr[idx - 1]);
+    for (let i = 1; i < uniqueStarts.length; i += 1) {
+      const diff = uniqueStarts[i] - uniqueStarts[i - 1];
+      if (diff > 0) gaps.push(diff);
+    }
+  });
+  const computedGap = gaps.length > 0 ? Math.max(...gaps) : 140;
+
+  const repeatX = Math.min(...boundElements.map(({ element }) => Number(element.x) || 0));
+
+  const bestByFieldType = new Map();
+  let maxBottom = 0;
+
+  boundElements.forEach(({ element, field, y }) => {
+    const rowIndex =
+      rowStarts.length > 1 ? Math.max(0, Math.round((y - repeatY) / computedGap)) : 0;
+    const normalizedY = y - rowIndex * computedGap;
+    const relX = (Number(element.x) || 0) - repeatX;
+    const relY = normalizedY - repeatY;
+    const relHeight = Number(element.height) || 0;
+    maxBottom = Math.max(maxBottom, relY + relHeight);
+
+    const key = `${field}@${element.type}`;
+    const current = bestByFieldType.get(key);
+    if (!current || relY < current.relY || (relY === current.relY && relX < current.relX)) {
+      bestByFieldType.set(key, { element, field, relX, relY });
     }
   });
 
-  const candidates = Array.from(rowsByKey.values());
-  if (candidates.length === 0) return null;
-
-  const fieldCounts = candidates.reduce((acc, item) => {
-    acc[item.field] = (acc[item.field] || 0) + 1;
-    return acc;
-  }, {});
-  const anchorField = Object.entries(fieldCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || candidates[0].field;
-  const rowStarts = candidates
-    .filter((c) => c.field === anchorField)
-    .map((c) => c.y)
-    .sort((a, b) => a - b);
-
-  const uniqueRowStarts = rowStarts.filter((y, idx) => idx === 0 || y !== rowStarts[idx - 1]);
-  const repeatY = uniqueRowStarts[0] ?? Math.min(...candidates.map((c) => c.y));
-  const rowGap =
-    uniqueRowStarts.length > 1
-      ? Math.min(...uniqueRowStarts.slice(1).map((y, idx) => y - uniqueRowStarts[idx]))
-      : 140;
-
-  const nextRowStart = uniqueRowStarts[1] ?? Infinity;
-  const firstRowElements = candidates
-    .map((c) => c.element)
-    .filter((el) => {
-      const y = Number(el.y) || 0;
-      return y >= repeatY && y < nextRowStart;
-    });
-
-  if (firstRowElements.length === 0) return null;
-
-  const repeatX = Math.min(...firstRowElements.map((el) => Number(el.x) || 0));
-  const childElements = firstRowElements.map((el) => {
-    const childBind = String(el.bind || '').slice(root.length + 1);
-    const { positionType, ...rest } = el;
+  const childElements = Array.from(bestByFieldType.values()).map(({ element, field, relX, relY }) => {
+    const { positionType, ...rest } = element;
     return {
       ...rest,
-      bind: childBind,
-      x: (Number(el.x) || 0) - repeatX,
-      y: (Number(el.y) || 0) - repeatY,
+      bind: field,
+      x: relX,
+      y: relY,
     };
   });
+
+  const rowGap = Math.max(computedGap, Math.ceil(maxBottom));
 
   return {
     id: `repeat-${root}`,
