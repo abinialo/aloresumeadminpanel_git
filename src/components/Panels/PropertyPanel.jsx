@@ -131,12 +131,12 @@ const PropertyPanel = () => {
                 <div className="grid grid-cols-2 gap-2">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Width</label>
-                                <input
-                                    type="number"
-                                    value={element.width}
-                                    onChange={(e) => handleWidthChange(parseNumberInput(e.target.value, element.width || 0))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded"
-                                />
+                        <input
+                            type="number"
+                            value={element.width}
+                            onChange={(e) => handleWidthChange(parseNumberInput(e.target.value, element.width || 0))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
@@ -256,6 +256,20 @@ const PropertyPanel = () => {
                 </div>
 
                 {/* Style */}
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Font Family</label>
+                    <select
+                        value={element.style?.fontFamily || 'Inter'}
+                        onChange={(e) => handleUpdate('style.fontFamily', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                    >
+                        {['Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Georgia', 'monospace'].map(font => (
+                            <option key={font} value={font}>{font}</option>
+                        ))}
+                    </select>
+                </div>
+                
                 <div className="border-t pt-4">
                     <h3 className="font-medium mb-2">Style</h3>
 
