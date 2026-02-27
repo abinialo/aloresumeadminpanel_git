@@ -10,7 +10,7 @@ const createDefaultSampleData = () => ({
     city: null,
     postalCode: null,
     state: null,
-    profileImage: null,
+    profileImage: 'https://allindev.s3.ap-south-1.amazonaws.com/1772179471915-gettyimages-1437816897-612x612.jpg',
     linkedIn: null,
     github: null,
     portfolio: null,
@@ -69,6 +69,22 @@ const normalizeRootKey = (root) => {
   if (root === 'project') return 'project';
   if (root === 'certificate' || root === 'certificates' || root === 'certification') return 'certifications';
   return root;
+};
+
+const normalizeBindPathForTracking = (bind) => {
+  if (typeof bind !== 'string') return '';
+  const parts = bind
+    .split('.')
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .filter((part) => !/^[0-9]+$/.test(part));
+  return parts.join('.');
+};
+
+const trackBoundPath = (boundPaths, bind) => {
+  const normalized = normalizeBindPathForTracking(bind);
+  if (!normalized) return;
+  boundPaths.add(normalized);
 };
 
 const mergeWithDefaults = (existingSampleData) => {
@@ -388,6 +404,7 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
   const rawElements = Array.isArray(layout?.elements) ? layout.elements : [];
   const elements = flattenElementsForSampleData(rawElements);
   setBoundValue._autoIndexState = {};
+  const boundPaths = new Set();
 
   elements.forEach((element) => {
     if (!element?.bind) return;
@@ -399,6 +416,7 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
 
     if (manualText === null) return;
     setBoundValue(sampleData, element.bind, manualText);
+    trackBoundPath(boundPaths, element.bind);
   });
 
   // Dedupe repeated rows caused by duplicate bindings in layout.
@@ -438,9 +456,98 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
   }
 
   delete setBoundValue._autoIndexState;
-  return sampleData;
+  return { sampleData, boundPaths };
+};
+
+export const filterSampleDataByBoundFields = (sampleData, boundPathsInput) => {
+  const boundPaths = boundPathsInput instanceof Set ? boundPathsInput : new Set(boundPathsInput || []);
+  if (!sampleData || boundPaths.size === 0) return {};
+
+  const filtered = {};
+
+  const filterObjectFields = (obj, root) => {
+    if (!obj || typeof obj !== 'object') return null;
+    const result = {};
+    Object.entries(obj).forEach(([key, value]) => {
+      if (!boundPaths.has(`${root}.${key}`)) return;
+      if (isEmptyValue(value)) return;
+      result[key] = value;
+    });
+    return Object.keys(result).length > 0 ? result : null;
+  };
+
+  const addBasic = () => {
+    const basic = filterObjectFields(sampleData.basic, 'basic');
+    if (basic) filtered.basic = basic;
+  };
+
+  const addCustomization = () => {
+    const customization = filterObjectFields(sampleData.customization, 'customization');
+    if (customization) filtered.customization = customization;
+  };
+
+  const addSummary = () => {
+    if (!boundPaths.has('summary')) return;
+    if (!isEmptyValue(sampleData.summary)) {
+      filtered.summary = sampleData.summary;
+    }
+  };
+
+  const addSkills = () => {
+    if (!sampleData.skills || typeof sampleData.skills !== 'object') return;
+    const skillSections = {};
+    ['technical', 'tools', 'softskills', 'otherskills'].forEach((section) => {
+      if (!boundPaths.has(`skills.${section}`)) return;
+      const values = (sampleData.skills[section] || []).filter((value) => !isEmptyValue(value));
+      if (values.length > 0) {
+        skillSections[section] = values;
+      }
+    });
+    if (Object.keys(skillSections).length > 0) {
+      filtered.skills = skillSections;
+    }
+  };
+
+  const addLanguages = () => {
+    const hasLanguageBind = Array.from(boundPaths).some(
+      (path) => path === 'languages' || path.startsWith('languages.')
+    );
+    if (!hasLanguageBind) return;
+    const languages = (Array.isArray(sampleData.languages) ? sampleData.languages : []).filter(
+      (value) => !isEmptyValue(value)
+    );
+    if (languages.length > 0) {
+      filtered.languages = languages;
+    }
+  };
+
+  const addRepeatSection = (root) => {
+    if (!Array.isArray(sampleData[root])) return;
+    const entries = sampleData[root]
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const cleaned = {};
+        Object.entries(item).forEach(([key, value]) => {
+          if (!isEmptyValue(value)) {
+            cleaned[key] = value;
+          }
+        });
+        return Object.keys(cleaned).length > 0 ? cleaned : null;
+      })
+      .filter(Boolean);
+    if (entries.length > 0) {
+      filtered[root] = entries;
+    }
+  };
+
+  addBasic();
+  addCustomization();
+  addSummary();
+  addSkills();
+  addLanguages();
+  ['experience', 'education', 'certifications', 'project'].forEach(addRepeatSection);
+
+  return filtered;
 };
 
 export default buildSampleDataFromLayout;
-
-

@@ -14,7 +14,7 @@ import {
   useUpdateTemplateMutation,
 } from '../../../hooks/useTemplateMutations';
 import SaveTemplateModal from './SaveTemplateModal';
-import { buildSampleDataFromLayout } from '../../../utils/sampleDataBuilder';
+import { buildSampleDataFromLayout, filterSampleDataByBoundFields } from '../../../utils/sampleDataBuilder';
 
 const EMPTY_LAYOUT = {
   page: { width: 595, height: 842, backgroundColor: '#ffffff' },
@@ -344,7 +344,8 @@ const AddTemplate = () => {
     } 
 
     try {
-      const sampleData = buildSampleDataFromLayout(layout);
+      const { sampleData, boundPaths } = buildSampleDataFromLayout(layout);
+      const payloadSampleData = filterSampleDataByBoundFields(sampleData, boundPaths);
       const normalizeRepeatChildBind = (repeatBind, childBind) => {
         if (typeof childBind !== 'string' || !childBind.trim()) return childBind;
         if (typeof repeatBind !== 'string' || !repeatBind.trim()) return childBind;
@@ -399,7 +400,7 @@ const AddTemplate = () => {
         // thumbnail:templateUrl,
         layoutJSON: normalizedLayout,
         categoryId: selectedCategoryId,
-        sampleData,
+        sampleData: payloadSampleData,
       };
 
       console.log('Payload:', payload);

@@ -6,7 +6,8 @@
         "phone": "+1 (555) 123-4567",
         "location": "San Francisco, CA",
         "linkedin": "linkedin.com/in/johndoe",
-        "website": "johndoe.com"
+        "website": "johndoe.com",
+        "profileImage": "https://allindev.s3.ap-south-1.amazonaws.com/1772179471915-gettyimages-1437816897-612x612.jpg"
     },
     "summary": "Experienced software engineer with 5+ years of expertise in full-stack development. Passionate about building scalable applications and leading high-performing teams.",
     "experience": [
