@@ -18,7 +18,7 @@ const resolvePath = (data, path) => {
 
 const normalizeRepeatRoot = (root) => {
   if (root === 'certificate' || root === 'certificates' || root === 'certification') return 'certifications';
-  if (root === 'project') return 'projects';
+  if (root === 'project') return 'project';
   return root;
 };
 

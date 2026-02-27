@@ -73,7 +73,7 @@
             "link": "https://example.com/cert/gcp-dev"
         }
     ],
-    "projects": [
+    "project": [
         {
             "name": "Project 1",
             "description": "Description 1",

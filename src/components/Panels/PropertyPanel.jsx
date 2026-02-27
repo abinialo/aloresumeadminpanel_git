@@ -194,7 +194,7 @@ const PropertyPanel = () => {
                             <option value="experience">Experience</option>
                             <option value="education">Education</option>
                             <option value="skills">Skills</option>
-                            <option value="projects">Projects</option>
+                            <option value="project">Project</option>
                             <option value="summary">Professional Summary</option>
                         </select>
                         <p className="text-xs text-gray-500 mt-1">Identifies the purpose of this section container</p>

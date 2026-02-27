@@ -50,7 +50,7 @@ const createDefaultSampleData = () => ({
       link: null,
     },
   ],
-  projects: [
+  project: [
     {
       title: null,
       description: null,
@@ -66,7 +66,7 @@ const createDefaultSampleData = () => ({
 });
 
 const normalizeRootKey = (root) => {
-  if (root === 'project') return 'projects';
+  if (root === 'project') return 'project';
   if (root === 'certificate' || root === 'certificates' || root === 'certification') return 'certifications';
   return root;
 };
@@ -162,12 +162,12 @@ const mergeWithDefaults = (existingSampleData) => {
         : Array.isArray(existingSampleData.certificate) && existingSampleData.certificate.length > 0
         ? existingSampleData.certificate.map((item) => ({ ...defaults.certifications[0], ...item }))
         : defaults.certifications,
-    projects:
-      Array.isArray(existingSampleData.projects) && existingSampleData.projects.length > 0
-        ? existingSampleData.projects.map((item) => ({ ...defaults.projects[0], ...item }))
+    project:
+      Array.isArray(existingSampleData.project) && existingSampleData.project.length > 0
+        ? existingSampleData.project.map((item) => ({ ...defaults.project[0], ...item }))
         : Array.isArray(existingSampleData.project) && existingSampleData.project.length > 0
-        ? existingSampleData.project.map((item) => ({ ...defaults.projects[0], ...item }))
-        : defaults.projects,
+        ? existingSampleData.project.map((item) => ({ ...defaults.project[0], ...item }))
+        : defaults.project,
   };
 };
 
@@ -322,7 +322,7 @@ const setBoundValue = (sampleData, bindPath, value) => {
     return;
   }
 
-  if (!['experience', 'education', 'certifications', 'projects'].includes(root)) return;
+  if (!['experience', 'education', 'certifications', 'project'].includes(root)) return;
 
   let index = 0;
   let fieldPosition = 1;
@@ -402,7 +402,7 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
   });
 
   // Dedupe repeated rows caused by duplicate bindings in layout.
-  ['experience', 'education', 'certifications', 'projects'].forEach((root) => {
+  ['experience', 'education', 'certifications', 'project'].forEach((root) => {
     if (!Array.isArray(sampleData[root])) return;
     sampleData[root] = dedupeArrayItems(sampleData[root]);
   });

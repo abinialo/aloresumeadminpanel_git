@@ -67,12 +67,12 @@ export const bindPaths = [
     { path: 'certifications.description', label: 'Certification Description (in list)', category: 'Certifications' },
     { path: 'certifications.link', label: 'Certification Link (in list)', category: 'Certifications' },
 
-    // Projects (Array)
+    // Project (Array)
     // =========================
-    { path: 'projects', label: 'Projects List', category: 'Projects', isArray: true },
-    { path: 'projects.title', label: 'Project Title (in list)', category: 'Projects' },
-    { path: 'projects.description', label: 'Project Description (in list)', category: 'Projects' },
-    { path: 'projects.link', label: 'Project Link (in list)', category: 'Projects' },
+    { path: 'project', label: 'Project List', category: 'Project', isArray: true },
+    { path: 'project.title', label: 'Project Title (in list)', category: 'Project' },
+    { path: 'project.description', label: 'Project Description (in list)', category: 'Project' },
+    { path: 'project.link', label: 'Project Link (in list)', category: 'Project' },
 
     // =========================
     // Customization

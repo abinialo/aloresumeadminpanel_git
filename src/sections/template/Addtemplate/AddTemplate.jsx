@@ -21,7 +21,7 @@ const EMPTY_LAYOUT = {
   elements: [],
 };
 
-const REPEAT_ROOTS = ['experience', 'education', 'projects', 'certificate', 'certifications'];
+const REPEAT_ROOTS = ['experience', 'education', 'project', 'certificate', 'certifications'];
 
 const getRepeatRootFromBind = (bind) => {
   if (typeof bind !== 'string' || !bind.includes('.')) return '';
@@ -151,7 +151,7 @@ const convertFlatSectionElementsToRepeat = (elements = []) => {
 
 const normalizeDataRoot = (root) => {
   if (root === 'certificate' || root === 'certificates' || root === 'certification') return 'certifications';
-  if (root === 'project') return 'projects';
+  if (root === 'project') return 'project';
   return root;
 };
 
@@ -365,7 +365,7 @@ const AddTemplate = () => {
       const normalizeLayoutElementForSave = (element) => {
         const normalizedZIndex = element.style?.zIndex ?? element.zIndex ?? 1;
         const { zIndex, marginTop, collapsed, ...restElement } = element;
-        const sectionRoots = new Set(['experience', 'education', 'projects', 'certificate', 'certifications']);
+        const sectionRoots = new Set(['experience', 'education', 'project', 'certificate', 'certifications']);
         const isTargetRepeat = element.type === 'repeat' && sectionRoots.has(element.bind);
 
         const normalizedChildren = Array.isArray(element.elements)
