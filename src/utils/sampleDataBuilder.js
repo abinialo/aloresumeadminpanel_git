@@ -409,6 +409,8 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
   elements.forEach((element) => {
     if (!element?.bind) return;
 
+    trackBoundPath(boundPaths, element.bind);
+
     const manualText =
       typeof element.text === 'string' && element.text.trim().length > 0
         ? element.text.trim()
@@ -416,7 +418,6 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
 
     if (manualText === null) return;
     setBoundValue(sampleData, element.bind, manualText);
-    trackBoundPath(boundPaths, element.bind);
   });
 
   // Dedupe repeated rows caused by duplicate bindings in layout.
