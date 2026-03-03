@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './navbar.module.css';
 import { Link, NavLink, Outlet} from 'react-router-dom';
-// import logo from '../../assets/ys_logo_green.png';
+import logo from '../../assets/logooo.png';
 import {
     FaUserCircle,
     FaBars,
@@ -74,7 +74,7 @@ const Navbar = () => {
                     <div>
                         <div className={styles.logo}>
                             <Link to='/'>
-                                {/* <img src={logo} alt="logo" /> */}
+                                <img src={logo} alt="logo" />
                             </Link>
                         </div>
                     </div>

@@ -71,6 +71,8 @@ const normalizeRootKey = (root) => {
   return root;
 };
 
+const ROW_Y_GAP_THRESHOLD = 48;
+
 const normalizeBindPathForTracking = (bind) => {
   if (typeof bind !== 'string') return '';
   const parts = bind
@@ -273,6 +275,27 @@ const combineRepeatBindPath = (parentBind, childBind) => {
   return `${parentBind}.${childBind}`;
 };
 
+const getRowIndexHint = (rowState, bind, y) => {
+  const parts = typeof bind === 'string' ? bind.split('.').filter(Boolean) : [];
+  if (parts.length === 0) return undefined;
+  const root = normalizeRootKey(parts[0]);
+  if (!['experience', 'education', 'certifications', 'project'].includes(root)) return undefined;
+  const numericY = Number(y);
+  if (!Number.isFinite(numericY)) return undefined;
+  const state = rowState[root] || { lastY: null, rowIndex: 0 };
+  if (state.lastY === null) {
+    state.lastY = numericY;
+    state.rowIndex = 0;
+  } else if (numericY - state.lastY > ROW_Y_GAP_THRESHOLD) {
+    state.rowIndex += 1;
+    state.lastY = numericY;
+  } else {
+    state.lastY = Math.min(state.lastY, numericY);
+  }
+  rowState[root] = state;
+  return state.rowIndex;
+};
+
 const flattenElementsForSampleData = (elements = [], parentBind = '') => {
   const flattened = [];
   const sorted = sortElementsByPosition(elements);
@@ -298,7 +321,7 @@ const flattenElementsForSampleData = (elements = [], parentBind = '') => {
   return flattened;
 };
 
-const setBoundValue = (sampleData, bindPath, value) => {
+const setBoundValue = (sampleData, bindPath, value, rowIndexHint) => {
   if (!bindPath || typeof bindPath !== 'string') return;
 
   const parts = bindPath.split('.').filter(Boolean);
@@ -356,37 +379,42 @@ const setBoundValue = (sampleData, bindPath, value) => {
   if (!hasExplicitIndex) {
     const autoIndexState = setBoundValue._autoIndexState || (setBoundValue._autoIndexState = {});
     const currentIndex = Number.isFinite(autoIndexState[root]) ? autoIndexState[root] : 0;
-    index = currentIndex;
-    while (sampleData[root].length <= index) {
-      sampleData[root].push({ ...sampleData[root][0] });
-    }
-
-    const existingValue = sampleData[root][index]?.[field];
-    const hasExistingValue =
-      existingValue !== null &&
-      existingValue !== undefined &&
-      String(existingValue).trim() !== '';
-
-    // Avoid creating extra rows for duplicate repeated bindings with same value.
-    if (hasExistingValue && String(existingValue).trim() !== String(value).trim()) {
-      index = currentIndex + 1;
-      autoIndexState[root] = index;
+    if (Number.isFinite(rowIndexHint) && rowIndexHint >= 0) {
+      index = rowIndexHint;
+      autoIndexState[root] = rowIndexHint;
     } else {
-      autoIndexState[root] = currentIndex;
-    }
+      index = currentIndex;
+      while (sampleData[root].length <= index) {
+        sampleData[root].push({ ...sampleData[root][0] });
+      }
 
-    while (sampleData[root].length <= index) {
-      sampleData[root].push({ ...sampleData[root][0] });
-    }
+      const existingValue = sampleData[root][index]?.[field];
+      const hasExistingValue =
+        existingValue !== null &&
+        existingValue !== undefined &&
+        String(existingValue).trim() !== '';
 
-    // Ignore exact duplicate write for same row+field+value.
-    const currentValue = sampleData[root][index]?.[field];
-    if (
-      currentValue !== null &&
-      currentValue !== undefined &&
-      String(currentValue).trim() === String(value).trim()
-    ) {
-      return;
+      // Avoid creating extra rows for duplicate repeated bindings with same value.
+      if (hasExistingValue && String(existingValue).trim() !== String(value).trim()) {
+        index = currentIndex + 1;
+        autoIndexState[root] = index;
+      } else {
+        autoIndexState[root] = currentIndex;
+      }
+
+      while (sampleData[root].length <= index) {
+        sampleData[root].push({ ...sampleData[root][0] });
+      }
+
+      // Ignore exact duplicate write for same row+field+value.
+      const currentValue = sampleData[root][index]?.[field];
+      if (
+        currentValue !== null &&
+        currentValue !== undefined &&
+        String(currentValue).trim() === String(value).trim()
+      ) {
+        return;
+      }
     }
   }
 
@@ -405,6 +433,7 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
   const elements = flattenElementsForSampleData(rawElements);
   setBoundValue._autoIndexState = {};
   const boundPaths = new Set();
+  const rowState = {};
 
   elements.forEach((element) => {
     if (!element?.bind) return;
@@ -417,7 +446,8 @@ export const buildSampleDataFromLayout = (layout, existingSampleData = null) => 
         : null;
 
     if (manualText === null) return;
-    setBoundValue(sampleData, element.bind, manualText);
+    const rowHint = getRowIndexHint(rowState, element.bind, element.y);
+    setBoundValue(sampleData, element.bind, manualText, rowHint);
   });
 
   // Dedupe repeated rows caused by duplicate bindings in layout.
