@@ -3,6 +3,7 @@ import Navbar from "./layouts/header/Navbar";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Template from "./sections/template/Template";
 import AddTemplate from "./sections/template/Addtemplate/AddTemplate";
+import AddCategory from "./sections/category/AddCategory";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
                 <Route index element={<Template />} />
                 <Route path="add" element={<AddTemplate />} />
               </Route>
+              <Route path="category" element={<AddCategory />} />
             </Route>
           </Route>
           {/* <Route path="/" element={<Login />} /> */}

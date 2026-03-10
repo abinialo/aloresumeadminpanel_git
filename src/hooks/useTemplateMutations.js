@@ -1,5 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createTemplate, getAllCategory, getTemplateBySlug, getTemplates, updateTemplate } from '../api/templateApi';
+import {
+  createCategory,
+  createTemplate,
+  getAllCategory,
+  getTemplateBySlug,
+  getTemplates,
+  updateCategory,
+  updateTemplate,
+  deleteCategory,
+} from '../api/templateApi';
+import { uploadFile } from '../api/fileApi';
 
 export const useCreateTemplateMutation = () => {
   return useMutation({
@@ -32,5 +42,29 @@ export const useGetAllCategoryQuery = () => {
   return useQuery({
     queryKey: ['categories'],
     queryFn: getAllCategory,
+  });
+};
+
+export const useCreateCategoryMutation = () => {
+  return useMutation({
+    mutationFn: createCategory,
+  });
+};
+
+export const useUploadFileMutation = () => {
+  return useMutation({
+    mutationFn: uploadFile,
+  });
+};
+
+export const useUpdateCategoryMutation = () => {
+  return useMutation({
+    mutationFn: updateCategory,
+  });
+};
+
+export const useDeleteCategoryMutation = () => {
+  return useMutation({
+    mutationFn: deleteCategory,
   });
 };

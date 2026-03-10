@@ -26,3 +26,21 @@ export const getAllCategory = async () => {
   const res = await apiClient.get('/category/getAllCategory');
   return res.data;
 };
+
+export const createCategory = async (payload) => {
+  const res = await apiClient.post('/category/createCategory', payload);
+  return res.data;
+};
+
+export const updateCategory = async ({ categoryId, payload }) => {
+  const res = await apiClient.put(
+    `/category/updateCategory/${encodeURIComponent(categoryId)}`,
+    payload
+  );
+  return res.data;
+};
+
+export const deleteCategory = async (categoryId) => {
+  const res = await apiClient.delete(`/category/deleteCategory/${encodeURIComponent(categoryId)}`);
+  return res.data;
+};

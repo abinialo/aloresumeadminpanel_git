@@ -5,6 +5,7 @@ import logo from '../../assets/logooo.png';
 import {
     FaUserCircle,
     FaBars,
+    FaUser,
   
 } from "react-icons/fa";
 import { Drawer } from 'antd';
@@ -56,7 +57,7 @@ const Navbar = () => {
             icon: <HiTemplate />
             , label: "Template", path: "template"
         },
-        // { icon: <FaUser />, label: "Master", path: "master" },
+        { icon: <FaUser />, label: "Category", path: "category" },
         // { icon: <FaBox />, label: "Products", path: "product" },
         // { icon: <FaDatabase />, label: "Stock management", path: "stock" },
         // { icon: <FaGift />, label: "Coupon", path: "coupon" },
