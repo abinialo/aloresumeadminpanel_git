@@ -201,6 +201,39 @@ const splitListText = (text) =>
     .map(normalizeListLine)
     .filter(Boolean);
 
+const DESCRIPTION_BULLET_PREFIX_REGEX = /^\s*(?:[-*\u2022]|\d+[.)])/;
+
+const normalizeDescriptionValue = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : item))
+      .filter((item) => item !== null && item !== undefined && String(item).trim() !== '');
+  }
+
+  const rawText = String(value || '');
+  const trimmedText = rawText.trim();
+  if (trimmedText === '') return '';
+
+  const normalizedLines = splitListText(rawText);
+  if (
+    normalizedLines.length > 1 ||
+    (normalizedLines.length > 0 && DESCRIPTION_BULLET_PREFIX_REGEX.test(rawText))
+  ) {
+    return normalizedLines;
+  }
+
+  return trimmedText;
+};
+
+const comparableValueString = (val) => {
+  if (Array.isArray(val)) {
+    return val
+      .map((item) => (item === null || item === undefined ? '' : String(item)))
+      .join('|');
+  }
+  return val === null || val === undefined ? '' : String(val);
+};
+
 const dedupeArrayItems = (items) => {
   const seen = new Set();
   const result = [];
@@ -373,6 +406,9 @@ const setBoundValue = (sampleData, bindPath, value, rowIndexHint) => {
 
   const field = parts[fieldPosition];
   if (!field) return;
+  const normalizedValue =
+    field === 'description' ? normalizeDescriptionValue(value) : value;
+  const incomingValueString = comparableValueString(normalizedValue).trim();
 
   // For array roots without an explicit index (e.g. "experience.company"),
   // advance to the next row when the same field is already populated.
@@ -389,13 +425,11 @@ const setBoundValue = (sampleData, bindPath, value, rowIndexHint) => {
       }
 
       const existingValue = sampleData[root][index]?.[field];
-      const hasExistingValue =
-        existingValue !== null &&
-        existingValue !== undefined &&
-        String(existingValue).trim() !== '';
+      const existingValueString = comparableValueString(existingValue).trim();
+      const hasExistingValue = existingValueString !== '';
 
       // Avoid creating extra rows for duplicate repeated bindings with same value.
-      if (hasExistingValue && String(existingValue).trim() !== String(value).trim()) {
+      if (hasExistingValue && existingValueString !== incomingValueString) {
         index = currentIndex + 1;
         autoIndexState[root] = index;
       } else {
@@ -408,11 +442,8 @@ const setBoundValue = (sampleData, bindPath, value, rowIndexHint) => {
 
       // Ignore exact duplicate write for same row+field+value.
       const currentValue = sampleData[root][index]?.[field];
-      if (
-        currentValue !== null &&
-        currentValue !== undefined &&
-        String(currentValue).trim() === String(value).trim()
-      ) {
+      const currentValueString = comparableValueString(currentValue).trim();
+      if (currentValueString !== '' && currentValueString === incomingValueString) {
         return;
       }
     }
@@ -423,7 +454,7 @@ const setBoundValue = (sampleData, bindPath, value, rowIndexHint) => {
   }
 
   if (Object.prototype.hasOwnProperty.call(sampleData[root][index], field)) {
-    sampleData[root][index][field] = value;
+    sampleData[root][index][field] = normalizedValue;
   }
 };
 
