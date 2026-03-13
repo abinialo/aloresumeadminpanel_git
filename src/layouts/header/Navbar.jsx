@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './navbar.module.css';
-import { Link, NavLink, Outlet} from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logooo.png';
 import {
     FaUserCircle,
@@ -15,8 +15,8 @@ import { HiTemplate } from "react-icons/hi";
 const Navbar = () => {
     const [isLogOpen, setLogIsOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(true);
-    const [, setLogoutModalOpen] = useState(false);
     const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
     const logoutRef = useRef(null);
 
     const toggleSidebar = () => setIsOpen(!isOpen);
@@ -52,6 +52,14 @@ const Navbar = () => {
             sessionStorage.removeItem("adminTab");
         };
     }, []);
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("adminTab");
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userid");
+        setLogIsOpen(false);
+        navigate('/login');
+    };
     const menuItems = [
         {
             icon: <HiTemplate />
@@ -92,7 +100,7 @@ const Navbar = () => {
                         {isLogOpen && (
                             <div className={styles.logoutdiv}>
                                 <p
-                                    onClick={() => { setLogoutModalOpen(true); setLogIsOpen(false) }}
+                                    onClick={handleLogout}
                                     className={styles.logout}
                                 >Logout</p>
                             </div>

@@ -7,6 +7,7 @@ const Template = () => {
   const navigate = useNavigate()
   const [page, setPage] = useState(0)
   const [limit, setLimit] = useState(10)
+  const [previewTemplate, setPreviewTemplate] = useState(null)
 
   const { data, isLoading, isError, error, isFetching } = useGetTemplatesQuery({ page, limit })
 
@@ -29,6 +30,15 @@ const Template = () => {
   const totalCount = payload?.totalCount ?? templates.length
   const fetchedCount = payload?.fetchedCount ?? templates.length
   const totalPages = Math.max(1, Math.ceil(totalCount / limit))
+
+  const handlePreviewOpen = (template) => {
+    if (!template?.thumbnail) return
+    setPreviewTemplate(template)
+  }
+
+  const handlePreviewClose = () => {
+    setPreviewTemplate(null)
+  }
 
   const pageStart = useMemo(() => {
     if (totalCount === 0) return 0
@@ -80,9 +90,9 @@ const Template = () => {
       {!isLoading && !isError && (
         <div className='p-8 pt-0'>
           <div className='mb-4 flex items-center justify-between'>
-            <p className='text-sm text-gray-600'>
-              Total: {totalCount} | Fetched: {fetchedCount} | Showing {pageStart}-{pageEnd}
-            </p>
+              <p className='text-sm text-gray-600'>
+                Total: {totalCount} | Fetched: {fetchedCount} | Showing {pageStart}-{pageEnd}
+              </p>
             {isFetching && <p className='text-xs text-gray-500'>Updating...</p>}
           </div>
 
@@ -98,10 +108,15 @@ const Template = () => {
               >
                 <div className='relative mb-2 h-[250px] overflow-hidden rounded'>
                   <img src={template.thumbnail} alt={template.name || 'Template'} className='h-full w-full object-cover' />
-                  <div className='pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-                    <div className='rounded-full bg-white/95 p-2'>
+                  <div className='absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+                    <button
+                      type='button'
+                      onClick={() => handlePreviewOpen(template)}
+                      className='rounded-full bg-white/95 p-2 shadow hover:bg-white'
+                      aria-label={`Preview ${template.name || 'template'}`}
+                    >
                       <Eye className='w-5 h-5 text-gray-800' />
-                    </div>
+                    </button>
                   </div>
                 </div>
                 <div className='flex items-center justify-between'>
@@ -135,6 +150,37 @@ const Template = () => {
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {previewTemplate && (
+        <div
+          className='fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4'
+          onClick={handlePreviewClose}
+        >
+          <div
+            className='relative w-[400px] rounded bg-white  shadow-lg'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type='button'
+              onClick={handlePreviewClose}
+              className='absolute flex items-center justify-center w-[20px] h-[20px] pb-1 top-3 right-3 rounded-full bg-gray-100  text-gray-600 hover:bg-gray-200'
+              aria-label='Close preview'
+            >
+              ×
+            </button>
+            {/* <p className='text-sm text-gray-500 mb-2'>
+              {previewTemplate.name || 'Template preview'}
+            </p> */}
+            <div className='h-[auto]  rounded border border-gray-200'>
+              <img
+                src={previewTemplate.thumbnail}
+                alt={previewTemplate.name || 'Template preview'}
+                className='h-full w-full object-cover '
+              />
+            </div>
           </div>
         </div>
       )}
